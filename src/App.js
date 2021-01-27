@@ -6,11 +6,19 @@ import { ReactComponent as ChevronRight } from './chevron-right.svg'
 
 function App() {
   const [searchResult, setSearchResult] = useState()
+  const [searchQuery, setSearchQuery] = useState('king')
+  const [page, setPage] = useState(1)
 
   useEffect(() => {
+    console.log(
+      'http://www.omdbapi.com/?apikey=a461e386&s=' +
+        searchQuery +
+        '&page=' +
+        page,
+    )
     const search = async () => {
       const response = await fetch(
-        'http://www.omdbapi.com/?apikey=a461e386&s=king',
+        'http://www.omdbapi.com/?apikey=a461e386&s=' + searchQuery + '&' + page,
       )
 
       const data = await response.json()
@@ -19,14 +27,17 @@ function App() {
         setSearchResult(data)
       }
     }
-
     search()
-  })
+  }, [searchQuery, page, searchResult])
 
   return (
     <div className="App">
       <div className="search">
-        <input type="text" placeholder="Search..." />
+        <input
+          type="text"
+          placeholder="Search..."
+          onChange={e => setSearchQuery(e.target.value)}
+        />
         <button>Search</button>
       </div>
       {!searchResult ? (
@@ -34,7 +45,11 @@ function App() {
       ) : (
         <div className="search-results">
           <div className="chevron">
-            <ChevronLeft />
+            <ChevronLeft
+              onClick={() => {
+                setPage(page - 1)
+              }}
+            />
           </div>
           <div className="search-results-list">
             {searchResult.Search.map(result => (
@@ -51,7 +66,11 @@ function App() {
             ))}
           </div>
           <div className="chevron">
-            <ChevronRight />
+            <ChevronRight
+              onClick={() => {
+                setPage(page + 1)
+              }}
+            />
           </div>
         </div>
       )}
