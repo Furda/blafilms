@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, createRef } from 'react'
 import './App.css'
 import placeholderImg from './placeholder.png'
 import { ReactComponent as ChevronLeft } from './chevron-left.svg'
@@ -10,35 +10,33 @@ function App() {
   const [page, setPage] = useState(1)
 
   useEffect(() => {
-    console.log(
-      'http://www.omdbapi.com/?apikey=a461e386&s=' +
-        searchQuery +
-        '&page=' +
-        page,
-    )
     const search = async () => {
       const response = await fetch(
-        'http://www.omdbapi.com/?apikey=a461e386&s=' + searchQuery + '&' + page,
+        'http://www.omdbapi.com/?apikey=a461e386&s=' +
+          searchQuery +
+          '&page=' +
+          page,
       )
 
       const data = await response.json()
 
-      if (!searchResult) {
+      if (data.Response) {
         setSearchResult(data)
       }
     }
     search()
-  }, [searchQuery, page, searchResult])
+  }, [searchQuery, page])
+
+  // Create a reference for the search input field
+  let searchInput = createRef()
 
   return (
     <div className="App">
       <div className="search">
-        <input
-          type="text"
-          placeholder="Search..."
-          onChange={e => setSearchQuery(e.target.value)}
-        />
-        <button>Search</button>
+        <input ref={searchInput} type="text" placeholder="Search..." />
+        <button onClick={() => setSearchQuery(searchInput.current.value)}>
+          Search
+        </button>
       </div>
       {!searchResult ? (
         <p>No results yet</p>
